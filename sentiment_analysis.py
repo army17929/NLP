@@ -49,7 +49,7 @@ sns.countplot(x='target',data = dataframe)
 # then, we can start the pre-processing of the dataset.
 data = dataframe[['text','target']] # We will select the text and the target column from the whole dataset. 
 data['target'] = data['target'].replace(4,1) # Currently, positive sentiment was labeled as 4, but we will replace it as 1 so that it is more intuitive. 
-print(data['target'].unique()) # Check whether the replacement was done properly.
+#print(data['target'].unique()) # Check whether the replacement was done properly.
 
 data_pos = data[data['target'] == 1]
 data_neg = data[data['target'] == 0]
@@ -60,7 +60,7 @@ dataset = pd.concat([data_pos,data_neg])
 
 # Convert uppercase into the lowercase.
 dataset['text'] = dataset['text'].str.lower()
-print(dataset['text'].tail())
+#print(dataset['text'].tail())
 
 # Next, we define the stopwords list in English.
 import spacy
@@ -73,7 +73,7 @@ def cleaning_stopwords(text) :
     return " ".join([word for word in str(text).split() if word not in stopwords])
     # This function will return the survived words from the input. 
 dataset['text'] = dataset['text'].apply(lambda text : cleaning_stopwords(text)) # This line means that for all the elements in dataset[txt], the function will be applied.
-print(dataset['text'].head())
+#print(dataset['text'].head())
 
 # Cleaning and removing punctuations.
 import string 
@@ -90,7 +90,7 @@ def cleaning_punctuations(text) :
     # therefore, this function makes sense. x and y parameter have the same length and z is something that we should remove.
     return text.translate(translator)
 dataset['text'] = dataset['text'].apply(lambda text: cleaning_punctuations(text))
-print(dataset['text'].tail())
+#print(dataset['text'].tail())
 
 # Cleaning and removing repeating characters. 
 def cleaning_repeating_char(text):
@@ -101,4 +101,53 @@ def cleaning_repeating_char(text):
     # y is the string that will substitute x. 
     # z is a set of strings. In this case it will be a sentence or a paragraph.
 dataset['text'] = dataset['text'].apply(lambda text: cleaning_repeating_char(text))
-print(dataset['text'].tail())
+#print(dataset['text'].tail()) 
+
+# Cleaning and removing URLs.
+def cleaning_URLs(text):
+    return re.sub('((www.[^s]+)|(https?://[^s]+))',' ',text) 
+    # Caveat : | means 'OR' ( \ does not work.)
+    # This function will remove the letters whenever it encounters 'www' OR 'https:/'
+dataset['text'] = dataset['text'].apply(lambda text : cleaning_URLs(text))
+# Apply this function for every element in the 'text' column
+#print(dataset['text'].tail())
+
+# Cleaning and removing numeric numbers 
+def cleaning_numbers(text):
+    return re.sub('[0-9]+',' ',text)
+    # This function will remove whatever number it encounters.
+dataset['text'] = dataset['text'].apply(lambda text : cleaning_numbers(text))
+#print(dataset['text'].tail())
+
+# We cleaned all the redundant texts from the data. 
+# Next, we need to tokenize the tweet. 
+
+from nltk.tokenize import RegexpTokenizer
+# Sometimes, we need to tokenize words even though there is no space between two words.
+# For example, if the type or language of the text changes, we need to tokenize.
+# ex) '안녕하세요(Hi). 제(My) 이름은(name is) 'O Hwang' 입니다.'
+# The sentence above contains Korean and English at the same time.
+# RegexpTokenizer will automatically separate different languages.
+tokenizer = RegexpTokenizer(r'\w+') # 'w' represent word.
+# I think we need to put '\' here. 
+# In the tutorial, there was no '\'. 
+dataset['text'] = dataset['text'].apply(tokenizer.tokenize)
+#print(dataset['text'].head())
+
+# Next, we start stemming from those tokens.
+stemmizer = nltk.PorterStemmer()
+def stemming_on_text(text):
+    text = [stemmizer.stem(word) for word in text]
+    return text
+dataset['text'] = dataset['text'].apply(stemming_on_text)
+#print(dataset['text'].head())
+
+# Lemmatize the text.
+nltk.download('wordnet')
+lemmatizer = nltk.WordNetLemmatizer()
+def lemmatizer_on_text(text):
+    text = [lemmatizer.lemmatize(word) for word in text]
+    return text 
+dataset['text'] = dataset['text'].apply(lambda text: lemmatizer_on_text(text))
+print(dataset['text'].head())
+# Pre-processing is done for the text.
