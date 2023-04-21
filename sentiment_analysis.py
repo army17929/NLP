@@ -7,6 +7,7 @@
 import re # Regular expression match, search, findall
 import numpy as np 
 import pandas as pd
+import os
 
 # Plotting
 import seaborn as sns
@@ -143,11 +144,80 @@ dataset['text'] = dataset['text'].apply(stemming_on_text)
 #print(dataset['text'].head())
 
 # Lemmatize the text.
-nltk.download('wordnet')
+# nltk.download('wordnet')
 lemmatizer = nltk.WordNetLemmatizer()
 def lemmatizer_on_text(text):
     text = [lemmatizer.lemmatize(word) for word in text]
     return text 
 dataset['text'] = dataset['text'].apply(lambda text: lemmatizer_on_text(text))
-print(dataset['text'].head())
+# print(dataset['text'].head())
 # Pre-processing is done for the text.
+X = data.text # This is our input (features)
+Y = data.target # This is our output (Labels) 
+# Note that data is the whole data which has 1.6M data points.
+# dataset is the frame that we intentionally truncated.
+
+# Generate wordcloud with negative data points. 
+data_neg = data['text'][:800000]
+plt.figure(figsize = (20,20))
+wc = WordCloud(max_words = 1000, width = 1600, height = 800, collocations = False).generate(" ".join(data_neg))
+plt.imshow(wc)
+#plt.show()
+
+# Generate wordcloud with positive data points
+data_pos = data['text'][800000:]
+plt.figure(figsize = (20,20))
+wc = WordCloud(max_words = 1000, width = 1600, height = 800, collocations = False).generate(" ".join(data_pos)) # Join is for the dataframe
+plt.imshow(wc)
+
+# Split the data using triain_test_split
+X_train, X_test, Y_train, Y_test = train_test_split(X,Y, test_size= 0.05, random_state= 26105111)
+print(X_train.head())
+
+# Transforming the dataset using TF-IDF vectorizer. 
+# TF-IDF assigns importance on the each word based on TF and IDF. 
+# There are another types of vectorizer such as 'Countvetorizer' - This function vectorize based on the frequency of the word. 
+# Tfidf vectorizes using the Tf and Idf information. This can be simply put as importance of the word.
+# Tf stands for term frequency, idf stands for inverse document frequency.
+from sklearn.feature_extraction.text import CountVectorizer
+
+vectorizer = TfidfVectorizer(ngram_range = (1,2), max_features = 500000)
+# There are many arguables for this function.
+# ngram_range : type = tuple, if ngram is (1,2), two connected words such as 'very good' or 'go back' will get a single index.
+# The default value of ngram is (1,1) which means that index will be assigned on the single word.
+vectorizer.fit(X_train) # Note that the vectorizer function expects the input to be a text, not a list.
+# using 'fit' command, the machine is going to study what kind of words are coming out from the data.
+# Learning about the data = fit 
+# Transforming the data = transform
+print('Number of feature words', len(vectorizer.get_feature_names_out()))
+
+X_train = vectorizer.transform(X_train)
+X_test = vectorizer.transform(X_test)
+
+# Function of model evaluation. 
+# There are three indicators for model performance. 
+# 1) Accuracy score 2) confusion matrix 3) ROC-AUC curve 
+def model_evaluate(model):
+    # Predict the values for test dataset 
+    Y_pred = model.predict(X_test)
+    # Print the evaluation metrics for the dataset. For the classification problem, accuracy will be an indicator.
+    print(classification_report(Y_test,Y_pred))
+    # Compute and plot the confusion matrix. 
+    cf_matrix = confusion_matrix(Y_test,Y_pred)
+    categories = ['Negative','Positive']
+    group_names = ['True Negative','False Positive','True Positive','False Positive']
+    group_percentages = ['{0:.2%}'.format(value) for value in cf_matrix.flatten() / np.sum(cf_matrix)]
+    labels = [f'{v1}n{v2}' for v1, v2 in zip(group_names, group_percentages)]
+    labels = np.asarray(labels).reshape(2,2)
+    sns.heatmap(cf_matrix, annot = labels, cmap = 'Blues', fmt = '', xticklabels = categories, yticklabels = categories)
+    plt.xlabel("Predicted values")
+    plt.ylabel("Actual Values")
+    plt.title("Confusion Matrix")
+    plt.show()
+
+# Model Building
+# 1) Bernoulli Naive Bayes Classifier 2) SVM 3) Logistic Regression 
+BNBmodel = BernoulliNB()
+BNBmodel.fit(X_train,Y_train)
+model_evaluate(BNBmodel)
+y_pred1 = BNBmodel.predict(X_test)
