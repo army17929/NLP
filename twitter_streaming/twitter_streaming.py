@@ -22,6 +22,12 @@ auth = tp.OAuth1UserHandler(api_key,api_key_secret)
 auth.set_access_token(access_token,access_token_secret)
 
 api = tp.API(auth)
-
-public_tweets = api.home_timeline()
-print(public_tweets)
+keyword = 'nuclear'
+count = 1 
+result = []
+while (count<=2):
+    tweets = api.search(keyword)
+    for tweet in tweets:
+        result.append(tweet)
+    count += 1
+print(result)
