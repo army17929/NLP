@@ -1,5 +1,6 @@
 import json
 import csv
+import pandas as pd
 
 # Read json file and then write that on the csv file.
 with open('data_update.json', 'r', encoding = 'utf-8') as input_file:
