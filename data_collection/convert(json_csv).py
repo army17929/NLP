@@ -1,15 +1,17 @@
 import json
 import csv
 import pandas as pd
+import os
 
 # Read json file and then write that on the csv file.
-with open('data_update.json', 'r', encoding = 'utf-8') as input_file:
+os.chdir(r'/home/ohwang/Desktop/Fastest_path_to_zero/NLP/data_collection')
+with open('data_collected.json', 'r', encoding = 'utf-8') as input_file:
     data = json.load(input_file)
 
 csv_data = data["data"]
 #print(csv_data)
 # Open a file for writing
-csv_file = open('data_file.csv','w')
+csv_file = open('data_collected.csv','w')
 # create the csv writer object
 csv_writer = csv.writer(csv_file)
 
