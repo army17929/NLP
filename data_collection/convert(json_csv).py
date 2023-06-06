@@ -28,4 +28,4 @@ for tweet in csv_data:
 csv_file.close()
 
 # Queries - nuclear power , nuclear energy, nuclear reactors, nuclear fission, nuclear waste
-# nuclear safety, nuclear fuel        
+# nuclear safety, nuclear fuel, nuclear radiation, nuclear power plants   
