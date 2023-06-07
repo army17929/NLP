@@ -26,6 +26,3 @@ for tweet in csv_data:
         count += 1
     csv_writer.writerow(tweet.values())
 csv_file.close()
-
-# Queries - nuclear power , nuclear energy, nuclear reactors, nuclear fission, nuclear waste
-# nuclear safety, nuclear fuel, nuclear radiation, nuclear power plants   
