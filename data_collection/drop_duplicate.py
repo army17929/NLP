@@ -10,5 +10,5 @@ df = pd.read_csv(file)
 df.columns = ['id' , 'id','tweets','keywords']
 
 # Drop duplicated values
-df = df.drop_duplicates(["tweets"],keep = "last")
+df = df.drop_duplicates(["tweets"], keep = "last")
 print(df.head)
