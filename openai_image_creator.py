@@ -1,12 +1,13 @@
 import json
 import os 
-import openai
+import openai 
 from pathlib import Path
 
-PROMPT = "Billionaire's house in Hawaii"
+PROMPT = "Nuclear reactor saving the world"
 
 # Define and create a data directory called 'responses' that will hold the API responses as json files.
 DATA_DIR = Path.cwd() / "responses"
+print(DATA_DIR)
 JSON_FILE = DATA_DIR / "image"
 DATA_DIR.mkdir(exist_ok=True)
 
