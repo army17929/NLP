@@ -2,7 +2,7 @@ from textblob import TextBlob
 import pandas as pd
 
 # Read the csv file into a dataframe
-df = pd.read_csv(r'C:\Users\every\OneDrive\바탕 화면\Github\NLP\data_collection\dropped_duplicates.csv')
+df = pd.read_csv(r'C:\Users\every\OneDrive\바탕 화면\Github\NLP\tweets(milestone_2000).csv')
 
 # Define a function to apply textblob sentiment analysis to each row.
 def get_sentiment(text):
@@ -19,4 +19,5 @@ def get_sentiment(text):
 df['sentiment'] = df['tweets'].apply(get_sentiment)
 
 # Print the results
-print(df.head())
+print(df)
+df.to_csv('labeled_textblob.csv')
