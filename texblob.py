@@ -16,7 +16,7 @@ def get_sentiment(text):
         sentiment = "Neutral"
     return sentiment
 # Apply the sentiment analysis function to the tweets column and create a new sentimnet column
-df['sentiment'] = df['tweets'].apply(get_sentiment)
+df['sentiment_TextBlob'] = df['tweets'].apply(get_sentiment)
 
 # Print the results
 print(df)
