@@ -22,23 +22,24 @@ bear = 'AAAAAAAAAAAAAAAAAAAAAApGmwEAAAAA0hwdTR1gQ63tHNb8e2uAfSuIEug%3DcY5XCQemEL
 client = tp.Client(bearer_token=bear)
 api = tp.API(auth)
 
-keyword = 'nuclear'
-count = 1 
-result = []
-while (count<=2):
-    tweets = client.search_recent_tweets(keyword,max_results = 10)
-    for tweet in tweets:
-        result.append(tweet)
-    count += 1
-print(result)
+# Define a custom StreamListener to handle incoming tweets
+class MyStreamListener(tp.StreamListener):
+    def on_status(self, status):
+        print(f"Tweet: {status.text}")
 
+# Create an instance of the custom StreamListener
+my_stream_listener = MyStreamListener()
+
+# Create a streaming object using the API and the custom StreamListener
+my_stream = tp.Stream(auth=api.auth, listener=my_stream_listener)
+
+# Filter the stream for tweets containing "nuclear power"
+my_stream.filter(track=["nuclear power"])
+
+'''
 import csv 
 
 with open('list_to_csv.csv','w',newline='',encoding='utf-8') as f:
     writer = csv.writer(f)
     writer.writerow(result)
-
-original_file = r'C:\Users\every\OneDrive\바탕 화면\Github\NLP\data_collection\data_collected.csv'
-#df = pd.read_csv(original_file,encoding='utf-8',error_bad_lines = False)
-#data = df['text']
-#print(data.head())
+'''
